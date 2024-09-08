@@ -1,0 +1,86 @@
+holidays_events:
+  type: spark.SparkDataset
+  filepath: data/02_intermediate/holidays_events
+  file_format: "delta"
+  save_args:
+    mode: overwrite
+    headers: true
+    overwriteSchema: true
+  load_args:
+    headers: true
+
+items:
+  type: spark.SparkDataset
+  filepath: data/02_intermediate/items
+  file_format: "delta"
+  save_args:
+    mode: overwrite
+    headers: true
+    overwriteSchema: true
+  load_args:
+    headers: true
+
+oil:
+  type: spark.SparkDataset
+  filepath: data/02_intermediate/oil
+  file_format: "delta"
+  save_args:
+    mode: overwrite
+    headers: true
+    overwriteSchema: true
+  load_args:
+    headers: true
+
+sample_submission:
+  type: spark.SparkDataset
+  filepath: data/02_intermediate/sample_submission
+  file_format: "delta"
+  save_args:
+    mode: overwrite
+    headers: true
+    overwriteSchema: true
+  load_args:
+    headers: true
+
+stores:
+  type: spark.SparkDataset
+  filepath: data/02_intermediate/stores
+  file_format: "delta"
+  save_args:
+    mode: overwrite
+    headers: true
+    overwriteSchema: true
+  load_args:
+    headers: true
+
+test:
+  type: spark.SparkDataset
+  filepath: data/02_intermediate/test
+  file_format: "delta"
+  save_args:
+    mode: overwrite
+    headers: true
+  load_args:
+    headers: true
+
+train:
+  type: spark.SparkDataset
+  filepath: data/02_intermediate/train
+  file_format: "delta"
+  save_args:
+    mode: overwrite
+    headers: true
+    overwriteSchema: true
+  load_args:
+    headers: true
+
+transactions:
+  type: spark.SparkDataset
+  filepath: data/02_intermediate/transactions
+  file_format: "delta"
+  save_args:
+    mode: overwrite
+    headers: true
+    overwriteSchema: true
+  load_args:
+    headers: true
