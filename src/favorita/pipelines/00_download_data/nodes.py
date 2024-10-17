@@ -84,7 +84,6 @@ def load_and_process_extracted_csvs(
     for csv_file in extract_dir_path.glob("*.csv"):
         if csv_file.name in file_mapping:
             df = spark.read.csv(path=str(csv_file), header=True)
-            # pl.scan_csv(source=str(csv_file), has_header=True)
             dataset_name = file_mapping[csv_file.name]
 
             processed_datasets[dataset_name] = df
