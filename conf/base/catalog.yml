@@ -1,86 +1,115 @@
+# Raw Unprocessed
 holidays_events:
   type: spark.SparkDataset
-  filepath: data/02_intermediate/holidays_events
-  file_format: "delta"
-  save_args:
-    mode: overwrite
-    headers: true
-    overwriteSchema: true
+  filepath: data/02_intermediate/holidays_events.parquet
+  file_format: parquet
   load_args:
-    headers: true
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
 
 items:
   type: spark.SparkDataset
-  filepath: data/02_intermediate/items
-  file_format: "delta"
-  save_args:
-    mode: overwrite
-    headers: true
-    overwriteSchema: true
+  filepath: data/02_intermediate/items.parquet
+  file_format: parquet
   load_args:
-    headers: true
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
+
 
 oil:
   type: spark.SparkDataset
-  filepath: data/02_intermediate/oil
-  file_format: "delta"
-  save_args:
-    mode: overwrite
-    headers: true
-    overwriteSchema: true
+  filepath: data/02_intermediate/oil.parquet
+  file_format: parquet
   load_args:
-    headers: true
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
 
 sample_submission:
   type: spark.SparkDataset
-  filepath: data/02_intermediate/sample_submission
-  file_format: "delta"
-  save_args:
-    mode: overwrite
-    headers: true
-    overwriteSchema: true
+  filepath: data/02_intermediate/sample_submission.parquet
+  file_format: parquet
   load_args:
-    headers: true
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
 
 stores:
   type: spark.SparkDataset
-  filepath: data/02_intermediate/stores
-  file_format: "delta"
-  save_args:
-    mode: overwrite
-    headers: true
-    overwriteSchema: true
+  filepath: data/02_intermediate/stores.parquet
+  file_format: parquet
   load_args:
-    headers: true
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
 
 test:
   type: spark.SparkDataset
-  filepath: data/02_intermediate/test
-  file_format: "delta"
-  save_args:
-    mode: overwrite
-    headers: true
+  filepath: data/02_intermediate/test.parquet
+  file_format: parquet
   load_args:
-    headers: true
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
 
 train:
   type: spark.SparkDataset
-  filepath: data/02_intermediate/train
-  file_format: "delta"
-  save_args:
-    mode: overwrite
-    headers: true
-    overwriteSchema: true
+  filepath: data/02_intermediate/train.parquet
+  file_format: parquet
   load_args:
-    headers: true
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
 
 transactions:
   type: spark.SparkDataset
-  filepath: data/02_intermediate/transactions
-  file_format: "delta"
-  save_args:
-    mode: overwrite
-    headers: true
-    overwriteSchema: true
+  filepath: data/02_intermediate/transactions.parquet
+  file_format: parquet
   load_args:
-    headers: true
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
+
+# Processed df
+train_processed:
+  type: polars.LazyPolarsDataset
+  filepath: data/03_primary/train_processed.parquet
+  file_format: parquet
+
+items_processed:
+  type: polars.LazyPolarsDataset
+  filepath: data/03_primary/items_processed.parquet
+  file_format: parquet
+
+stores_processed:
+  type: polars.LazyPolarsDataset
+  filepath: data/03_primary/stores_processed.parquet
+  file_format: parquet
+
+calendar:
+  type: polars.LazyPolarsDataset
+  filepath: data/03_primary/calendar.parquet
+  file_format: parquet
+
+all_train:
+  type: polars.LazyPolarsDataset
+  filepath: data/03_primary/all_train_processed.parquet
+  file_format: parquet
