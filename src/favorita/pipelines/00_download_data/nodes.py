@@ -11,7 +11,7 @@ import kaggle
 import py7zr
 from pyspark.sql import DataFrame, SparkSession
 
-spark: SparkSession = SparkSession.builder.getOrCreate()
+spark = SparkSession.getActiveSession()
 
 
 def download_dataset(competition: str, dataset_dir: str) -> str:
@@ -78,13 +78,13 @@ def load_and_process_extracted_csvs(
         "transactions.csv": "transactions",
     }
 
-    processed_datasets = {}
+    processed_datasets: Dict[str, DataFrame] = {}
 
     extract_dir_path = Path(extract_dir)
     for csv_file in extract_dir_path.glob("*.csv"):
         if csv_file.name in file_mapping:
             df = spark.read.csv(path=str(csv_file), header=True)
-
+            # pl.scan_csv(source=str(csv_file), has_header=True)
             dataset_name = file_mapping[csv_file.name]
 
             processed_datasets[dataset_name] = df
