@@ -1,6 +1,5 @@
 import logging
 
-from delta import configure_spark_with_delta_pip
 from kedro.framework.hooks import hook_impl
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
@@ -19,7 +18,6 @@ class SparkHooks:
 
         # Initialise the spark session
         spark_builder = SparkSession.builder.appName(context.project_path.name)
-        configure_spark_with_delta_pip(spark_builder)
         spark_session_conf = spark_builder.enableHiveSupport().config(
             conf=spark_conf
         )
