@@ -17,13 +17,17 @@ def clean_items(items: DataFrame) -> DataFrame:
         F.lit(1.0)
     )
 
-    items = items.withColumns(
-        {
-            "perishable": perishable_cast,
-            "item_id": item_cast,
-            "class": class_cast,
-        }
-    ).withColumn("item_weight", item_weight)
+    items = (
+        items.withColumns(
+            {
+                "perishable": perishable_cast,
+                "item_id": item_cast,
+                "class": class_cast,
+            }
+        )
+        .withColumn("item_weight", item_weight)
+        .drop("item_nbr")
+    )
 
     return items
 
@@ -34,7 +38,7 @@ def clean_stores(stores: DataFrame) -> DataFrame:
             "store_id": F.col("store_nbr").cast(T.IntegerType()),
             "cluster": F.col("cluster").cast(T.IntegerType()),
         }
-    )
+    ).drop("store_nbr")
 
     return stores
 
@@ -45,15 +49,18 @@ def clean_train(train: DataFrame) -> DataFrame:
         .when(F.col("onpromotion") == "False", F.lit(False))
         .otherwise(F.lit(None))
     )
-    train = train.withColumns(
-        {
-            "date": F.to_date("date"),
-            "store_id": F.col("store_nbr").cast(T.IntegerType()),
-            "item_id": F.col("item_nbr").cast(T.IntegerType()),
-            "unit_sales": F.col("unit_sales").cast(T.DoubleType()),
-            "on_promotion": on_promotion_check,
-        }
-    ).withColumn("calmonth", F.trunc("date", format="month"))
+    train = (
+        train.withColumns(
+            {
+                "date": F.to_date("date"),
+                "store_id": F.col("store_nbr").cast(T.IntegerType()),
+                "item_id": F.col("item_nbr").cast(T.IntegerType()),
+                "unit_sales": F.col("unit_sales").cast(T.DoubleType()),
+                "on_promotion": on_promotion_check,
+            }
+        )
+        .drop("store_nbr", "item_nbr", "onpromotion")
+    )
     return train
 
 
