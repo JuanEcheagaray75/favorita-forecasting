@@ -157,3 +157,4 @@ session_store.db
 stats.json
 *.pkl
 !*.xlsx
+mlruns
