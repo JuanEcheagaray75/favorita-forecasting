@@ -1,4 +1,4 @@
-# Raw Unprocessed
+# 02_intermediate
 holidays_events:
   type: spark.SparkDataset
   filepath: data/02_intermediate/holidays_events.parquet
@@ -20,7 +20,6 @@ items:
   save_args:
     header: True
     mode: overwrite
-
 
 oil:
   type: spark.SparkDataset
@@ -88,28 +87,104 @@ transactions:
     header: True
     mode: overwrite
 
-# Processed df
-train_processed:
-  type: polars.LazyPolarsDataset
-  filepath: data/03_primary/train_processed.parquet
-  file_format: parquet
-
-items_processed:
-  type: polars.LazyPolarsDataset
-  filepath: data/03_primary/items_processed.parquet
-  file_format: parquet
-
-stores_processed:
-  type: polars.LazyPolarsDataset
-  filepath: data/03_primary/stores_processed.parquet
-  file_format: parquet
-
+# 03_primary
 calendar:
-  type: polars.LazyPolarsDataset
+  type: spark.SparkDataset
   filepath: data/03_primary/calendar.parquet
   file_format: parquet
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
 
-all_train:
-  type: polars.LazyPolarsDataset
-  filepath: data/03_primary/all_train_processed.parquet
+items_processed:
+  type: spark.SparkDataset
+  filepath: data/03_primary/items_processed.parquet
   file_format: parquet
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
+
+stores_processed:
+  type: spark.SparkDataset
+  filepath: data/03_primary/stores_processed.parquet
+  file_format: parquet
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
+
+train_processed:
+  type: spark.SparkDataset
+  filepath: data/03_primary/train_processed.parquet
+  file_format: parquet
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
+
+weekly_sales_filled:
+  type: spark.SparkDataset
+  filepath: data/03_primary/weekly_sales_filled.parquet
+  file_format: parquet
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
+
+# Features df
+featured_weekly_sales_filled:
+  type: spark.SparkDataset
+  filepath: data/04_feature/featured_weekly_sales_filled.parquet
+  file_format: parquet
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
+
+# Model Input
+train_featurized:
+  type: spark.SparkDataset
+  filepath: data/05_model_input/train.parquet
+  file_format: parquet
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
+
+val_featurized:
+  type: spark.SparkDataset
+  filepath: data/05_model_input/val.parquet
+  file_format: parquet
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
+
+test_featurized:
+  type: spark.SparkDataset
+  filepath: data/05_model_input/test.parquet
+  file_format: parquet
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite

@@ -1,21 +1,25 @@
 # General Properties
-spark.driver.memory: 5g
-spark.driver.cores: 5
-spark.driver.maxResultSize: 4g
-spark.executor.memory: 4g
-spark.executor.cores: 4
-spark.default.parallelism: 8
-spark.memory.fraction: 0.6
+spark.master: local[8]
+spark.driver.memory: 4g
+spark.executor.memory: 8g
+spark.driver.memoryOverhead: 1g
+spark.executor.memoryOverhead: 1536m
+spark.default.parallelism: 128
+spark.memory.fraction: 0.5
 spark.scheduler.mode: FAIR
+spark.driver.maxResultSize: 4g
 
 # SQL
-spark.sql.execution.arrow.pyspark.enabled: false
+spark.sql.execution.arrow.pyspark.enabled: true
+spark.sql.cbo.enabled: true
+spark.sql.adaptive.enabled: true
+spark.sql.adaptive.coalescePartitions: true
 
 # Spark UI
+spark.ui.port: 4040
 spark.ui.enabled: true
-spark.ui.port: 4042
 spark.port.maxRetries: 30
 
-# Extra
-spark.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-spark.databricks.delta.schema.autoMerge.enabled: true
+# Danger Zone
+spark.executor.extraJavaOptions: "-XX:+UseG1GC,-XX:+UseCompressedOops"
+spark.driver.extraJavaOptions: "-XX:+UseG1GC,-XX:+UseCompressedOops"
