@@ -8,14 +8,10 @@ spark = SparkSession.getActiveSession()
 
 
 def clean_items(items: DataFrame) -> DataFrame:
-    perishable_cast = (
-        F.col("perishable").cast(T.ShortType()).cast(T.BooleanType())
-    )
+    perishable_cast = F.col("perishable").cast(T.ShortType()).cast(T.BooleanType())
     item_cast = F.col("item_nbr").cast(T.IntegerType())
     class_cast = F.col("class").cast(T.IntegerType())
-    item_weight = F.when(F.col("perishable"), F.lit(1.25)).otherwise(
-        F.lit(1.0)
-    )
+    item_weight = F.when(F.col("perishable"), F.lit(1.25)).otherwise(F.lit(1.0))
 
     items = (
         items.withColumns(
@@ -49,26 +45,21 @@ def clean_train(train: DataFrame) -> DataFrame:
         .when(F.col("onpromotion") == "False", F.lit(False))
         .otherwise(F.lit(None))
     )
-    train = (
-        train.withColumns(
-            {
-                "date": F.to_date("date"),
-                "store_id": F.col("store_nbr").cast(T.IntegerType()),
-                "item_id": F.col("item_nbr").cast(T.IntegerType()),
-                "unit_sales": F.col("unit_sales").cast(T.DoubleType()),
-                "on_promotion": on_promotion_check,
-            }
-        )
-        .drop("store_nbr", "item_nbr", "onpromotion")
-    )
+    train = train.withColumns(
+        {
+            "date": F.to_date("date"),
+            "store_id": F.col("store_nbr").cast(T.IntegerType()),
+            "item_id": F.col("item_nbr").cast(T.IntegerType()),
+            "unit_sales": F.col("unit_sales").cast(T.DoubleType()),
+            "on_promotion": on_promotion_check,
+        }
+    ).drop("store_nbr", "item_nbr", "onpromotion")
     return train
 
 
 def create_calendar(train_processed: DataFrame) -> DataFrame:
     earliest, latest = (
-        train_processed.select(F.min("date"), F.max("date"))
-        .toPandas()
-        .values[0]
+        train_processed.select(F.min("date"), F.max("date")).toPandas().values[0]
     )
 
     all_dates = generate_dates(earliest, latest)

@@ -1,8 +1,3 @@
-"""
-This is a boilerplate pipeline 'download_data'
-generated using Kedro 0.19.6
-"""
-
 from pathlib import Path
 from typing import Dict
 from zipfile import ZipFile
@@ -25,9 +20,7 @@ def download_dataset(competition: str, dataset_dir: str) -> str:
 
     if not dataset_file.is_file():
         kaggle.api.authenticate()
-        kaggle.api.competition_download_files(
-            competition=competition, path=dataset_dir
-        )
+        kaggle.api.competition_download_files(competition=competition, path=dataset_dir)
 
     return str(dataset_file)
 

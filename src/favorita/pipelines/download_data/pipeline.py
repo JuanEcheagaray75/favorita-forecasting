@@ -1,8 +1,3 @@
-"""
-This is a boilerplate pipeline 'download_data'
-generated using Kedro 0.19.6
-"""
-
 from kedro.pipeline import Pipeline, node
 
 from .nodes import (
