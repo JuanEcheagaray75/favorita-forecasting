@@ -152,7 +152,6 @@ venv.bak/
 
 # Personal ignores
 .vscode
-notebooks/
 session_store.db
 stats.json
 *.pkl
