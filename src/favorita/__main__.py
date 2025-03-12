@@ -1,6 +1,7 @@
 """favorita file for ensuring the package is executable
 as `favorita` and `python -m favorita`
 """
+
 import importlib
 from pathlib import Path
 
