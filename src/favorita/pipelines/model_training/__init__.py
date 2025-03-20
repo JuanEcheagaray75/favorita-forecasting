@@ -1,6 +1,6 @@
 """
-This is a boilerplate pipeline 'train_model'
-generated using Kedro 0.19.9
+This is a boilerplate pipeline 'model_training'
+generated using Kedro 0.19.11
 """
 
 from .pipeline import create_pipeline

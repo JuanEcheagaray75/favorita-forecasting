@@ -1,6 +1,6 @@
 """
-This is a boilerplate pipeline 'train_test_split'
-generated using Kedro 0.19.9
+This is a boilerplate pipeline 'cross_val_dataset'
+generated using Kedro 0.19.11
 """
 
 from .pipeline import create_pipeline

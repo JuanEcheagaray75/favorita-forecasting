@@ -1,130 +1,71 @@
-from pyspark.sql import DataFrame
 import pyspark.sql.functions as F
-from pyspark.sql.window import Window as W
-
+from pyspark.sql import DataFrame
 
 from .feature_functions import (
-    add_lags,
-    add_agg_over_windows,
-    mean_real_purchase,
-    add_one_side_rbf,
-    add_smooth_rbf,
+    SparkAggFn,
+    add_features_per_grouping,
+    define_grouping_alias,
+    divide_col_over,
 )
 
 
 def featurize_df(weekly_sales_filled: DataFrame) -> DataFrame:
-    MAX_SALE_LAG = 6
-    lags = list(range(1, MAX_SALE_LAG + 1))
-    lag_cols = [f"lag_unit_sale_{i}" for i in lags]
+    default_agg_fns = [
+        SparkAggFn("mean", F.mean),
+        SparkAggFn("std", F.std),
+        SparkAggFn("min", F.min),
+        SparkAggFn("max", F.max),
+        SparkAggFn("median", F.percentile, {"percentage": 0.5}),
+    ]
 
-    store_item_window = W.partitionBy("store_id", "item_id").orderBy("date")
-    cluster_window = W.partitionBy("cluster").orderBy("date")
-    class_window = W.partitionBy("class").orderBy("date")
-    family_window = W.partitionBy("family").orderBy("date")
-
-    # Window sizes
-    period_sizes = [4, 8, 12]
-
-    df = (
+    featured_df = (
         weekly_sales_filled.transform(
-            add_lags, lag_col="unit_sale", window=store_item_window, lags=lags
+            add_features_per_grouping,
+            grouping_cols=["store_id", "item_id"],
+            group_periods=[4, 8, 12, 24],
+            agg_spark_fns=default_agg_fns,
+            lags=list(range(1, 5)),
+        )
+        .transform(
+            add_features_per_grouping,
+            grouping_cols=["store_id", "class"],
+            group_periods=[4, 8, 12, 24],
+            agg_spark_fns=default_agg_fns,
+            lags=None,
+        )
+        .transform(
+            add_features_per_grouping,
+            grouping_cols=["store_id"],
+            group_periods=[4, 8, 12, 24],
+            agg_spark_fns=default_agg_fns,
+            lags=None,
+        )
+        .transform(
+            divide_col_over,
+            val_col="lag_store_item_sale_1",
+            divisor_cols=[
+                f"mean_{define_grouping_alias(["store_id", "item_id"])}_4",
+                f"median_{define_grouping_alias(["store_id", "item_id"])}_4",
+                f"max_{define_grouping_alias(["store_id", "item_id"])}_4",
+                f"mean_{define_grouping_alias(["store_id"])}_4",
+                f"median_{define_grouping_alias(["store_id"])}_4",
+                f"max_{define_grouping_alias(["store_id"])}_4",
+                f"mean_{define_grouping_alias(["store_id", "class"])}_4",
+                f"median_{define_grouping_alias(["store_id", "class"])}_4",
+                f"max_{define_grouping_alias(["store_id", "class"])}_4",
+            ],
+        )
+        .transform(
+            divide_col_over,
+            val_col=f"mean_{define_grouping_alias(["store_id", "item_id"])}_4",
+            divisor_cols=[
+                f"std_{define_grouping_alias(["store_id", "item_id"])}_4",
+                f"std_{define_grouping_alias(["store_id", "item_id"])}_8",
+                f"std_{define_grouping_alias(["store_id", "item_id"])}_12",
+            ],
         )
         .withColumn(
-            "sales_diff_week", F.col("lag_unit_sale_1") - F.col("lag_unit_sale_2")
+            "week_sale_diff", F.col("unit_sale") - F.col("lag_store_item_sale_1")
         )
-        # Periodic Exponential Peaks
-        .transform(add_one_side_rbf, peak_at=52, alpha=10)
-        .transform(add_one_side_rbf, peak_at=18, alpha=10)
-        .transform(add_one_side_rbf, peak_at=40, alpha=10)
-        # Smooth week effects
-        .transform(add_smooth_rbf, peak_at=52, alpha=15)
-        .transform(add_smooth_rbf, peak_at=40, alpha=15)
-        .transform(add_smooth_rbf, peak_at=18, alpha=15)
-        # Smooth month effects
-        .transform(add_smooth_rbf, peak_at=50, alpha=75)
-        .transform(add_smooth_rbf, peak_at=36, alpha=75)
-        .transform(add_smooth_rbf, peak_at=10, alpha=75)
-        .transform(
-            add_agg_over_windows,
-            val_col="sales_diff_week",
-            prefix="sales_diff_mean",
-            agg_spark_fn=F.mean,
-            window=store_item_window,
-            periods=period_sizes,
-        )
-        .transform(
-            add_agg_over_windows,
-            val_col="sales_diff_week",
-            prefix="sales_diff_std",
-            agg_spark_fn=F.std,
-            window=store_item_window,
-            periods=period_sizes,
-        )
-        .transform(
-            add_agg_over_windows,
-            val_col="unit_sale",
-            prefix="store_item_real_mean",
-            agg_spark_fn=mean_real_purchase,
-            window=store_item_window,
-            periods=period_sizes,
-        )
-        .transform(
-            add_agg_over_windows,
-            val_col="unit_sale",
-            prefix="store_item_max",
-            agg_spark_fn=F.max,
-            window=store_item_window,
-            periods=[4],
-        )
-        .transform(
-            add_agg_over_windows,
-            val_col="unit_sale",
-            prefix="store_item_std",
-            agg_spark_fn=F.stddev_samp,
-            window=store_item_window,
-            periods=period_sizes,
-        )
-        .transform(
-            add_agg_over_windows,
-            val_col="unit_sale",
-            prefix="family_mean",
-            agg_spark_fn=F.mean,
-            window=family_window,
-            periods=period_sizes,
-        )
-        .transform(
-            add_agg_over_windows,
-            val_col="unit_sale",
-            prefix="class_mean",
-            agg_spark_fn=F.mean,
-            window=class_window,
-            periods=period_sizes,
-        )
-        .transform(
-            add_agg_over_windows,
-            val_col="unit_sale",
-            prefix="class_real_mean",
-            agg_spark_fn=mean_real_purchase,
-            window=class_window,
-            periods=period_sizes,
-        )
-        .transform(
-            add_agg_over_windows,
-            val_col="unit_sale",
-            prefix="class_std",
-            agg_spark_fn=F.stddev_samp,
-            window=class_window,
-            periods=[4, 12],
-        )
-        .transform(
-            add_agg_over_windows,
-            val_col="unit_sale",
-            prefix="cluster_mean",
-            agg_spark_fn=F.mean,
-            window=cluster_window,
-            periods=period_sizes,
-        )
-        .dropna(subset=lag_cols)
     )
-
-    return df
+    return featured_df

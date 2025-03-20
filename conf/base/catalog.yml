@@ -143,6 +143,18 @@ weekly_sales_filled:
     header: True
     mode: overwrite
 
+calendar_processed:
+  type: spark.SparkDataset
+  filepath: data/03_primary/calendar_processed.parquet
+  file_format: parquet
+  load_args:
+    header: True
+    inferSchema: True
+  save_args:
+    header: True
+    mode: overwrite
+
+
 # Features df
 featured_weekly_sales_filled:
   type: spark.SparkDataset
@@ -155,10 +167,10 @@ featured_weekly_sales_filled:
     header: True
     mode: overwrite
 
-# Model Input
-train_featurized:
+# Cross Validation Datasets
+cross_val_datasets:
   type: spark.SparkDataset
-  filepath: data/05_model_input/train.parquet
+  filepath: data/04_feature/cross_val_datasets.parquet
   file_format: parquet
   load_args:
     header: True
@@ -166,25 +178,4 @@ train_featurized:
   save_args:
     header: True
     mode: overwrite
-
-val_featurized:
-  type: spark.SparkDataset
-  filepath: data/05_model_input/val.parquet
-  file_format: parquet
-  load_args:
-    header: True
-    inferSchema: True
-  save_args:
-    header: True
-    mode: overwrite
-
-test_featurized:
-  type: spark.SparkDataset
-  filepath: data/05_model_input/test.parquet
-  file_format: parquet
-  load_args:
-    header: True
-    inferSchema: True
-  save_args:
-    header: True
-    mode: overwrite
+    partition_by: ["date", "fold_id"]
